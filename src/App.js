@@ -71,36 +71,27 @@ const events = [
     color: 'green',
   },
 ];
+const formattedDate = (_date) => {
+  const date = new Date(_date);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}-${month}-${year}`;
+};
 
 function App() {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const [newEvent, setNewEvent] = useState({ title: '', start: '', end: '' });
 
-  const [allEvents, setAllEvents] = useState(events);
+  const [newEvent, setNewEvent] = useState({ id: '', title: '', start: '', end: '' });
+  const [allEvents, setAllEvents] = useState([]);
 
   function handleAddEvent() {
-    for (let i = 0; i < allEvents.length; i++) {
-      const d1 = new Date(allEvents[i].start);
-      const d2 = new Date(newEvent.start);
-      const d3 = new Date(allEvents[i].end);
-      const d4 = new Date(newEvent.end);
-      /*
-          console.log(d1 <= d2);
-          console.log(d2 <= d3);
-          console.log(d1 <= d4);
-          console.log(d4 <= d3);
-            */
-
-      if ((d1 <= d2 && d2 <= d3) || (d1 <= d4 && d4 <= d3)) {
-        // alert('CLASH');
-        break;
-      }
-    }
-
-    setAllEvents([...allEvents, newEvent]);
-    console.log(setAllEvents);
+    const id = new Date().getSeconds();
+    setAllEvents((prev) => [...prev, { ...newEvent, id }]);
+    setOpen(false);
   }
 
   return (
@@ -133,37 +124,35 @@ function App() {
         <div>
           <h1>Importent days</h1>
 
-          {allEvents.map((item) => {
-            return (
-              <>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Category</th>
-                      <th>Events</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
+          <>
+            <table>
+              <thead>
+                <tr>
+                  {/* <th>id</th> */}
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>Category</th>
+                  <th>Events</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allEvents?.map((item, index) => {
+                  return (
+                    <tr key={item?.id}>
+                      {/* <td>{item?.id}</td> */}
+                      <td>{formattedDate(item.start)}</td>
+                      <td>{formattedDate(item.end)}</td>
+                      <td>{item.title}</td>
                       <td>{item.event}</td>
 
-                      <td>{item.title}</td>
-                      <td>Events</td>
                       <td> Delete / Edit</td>
-                      {/* <td>{item.start}</td>
-                      <td>{item.end}</td> */}
                     </tr>
-                  </tbody>
-                </table>
-              </>
-
-              //  <h2>{setAllEvents}</h2>
-              //         <h2>{setNewEvent}</h2>
-              //         <h2>{handleAddEvent}</h2>
-            );
-          })}
+                  );
+                })}
+              </tbody>
+            </table>
+          </>
 
           <div>
             <div
@@ -193,12 +182,12 @@ function App() {
 
                   <div>
                     {/* <input
-                  type='text'
-                  placeholder='Add Title'
-                  style={{ width: '60%', marginRight: '10px' }}
-                  value={newEvent.title}
-                  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                /> */}
+		  type='text'
+		  placeholder='Add Title'
+		  style={{ width: '60%', marginRight: '10px' }}
+		  value={newEvent.title}
+		  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+		/> */}
                     <form>
                       {/* <label id='label'>Select priority </label> */}
                       <select
@@ -206,12 +195,9 @@ function App() {
                         onChange={(e) => setNewEvent({ title: e.target.value })}
                         id='priority'
                       >
-                        {events.map((item, i) => (
-                          <option>{item.title}</option>
+                        {events?.map((item, i) => (
+                          <option key={i}>{item.title}</option>
                         ))}
-                        {/* <option> HIGH </option>
-                    <option> MEDIUM </option>
-                    <option> LOW </option> */}
                       </select>
                       <br />
                       <input
